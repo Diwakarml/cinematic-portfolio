@@ -1,8 +1,9 @@
-﻿services:
+services:
   - type: web
     name: cinematic-portfolio
     runtime: node
     plan: free
+    branch: main
     buildCommand: npm ci && npm run build
     startCommand: npm start
     envVars:
