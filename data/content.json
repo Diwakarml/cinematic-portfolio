@@ -1,0 +1,22 @@
+{
+  "site": {
+    "tagline": "Portfolio 2026"
+  },
+  "hero": {
+    "taglineHighlight": "Full-Stack",
+    "freelanceNote": "Open to full-stack development, AI/ML, and software engineering opportunities.",
+    "availableLabel": "Available for opportunities",
+    "pills": ["Full-Stack Dev", "AI & ML", "Next.js", "Python"],
+    "specialistStat": { "value": "MCA", "label": "Graduate" }
+  },
+  "interstitial": {
+    "availabilityLabel": "Availability",
+    "basedInLabel": "Based in",
+    "statLabels": ["Projects\nbuilt", "Research\npaper", "Internship\ncompleted"]
+  },
+  "footer": {
+    "eyebrow": "Available for full-stack and AI/ML opportunities",
+    "ctaLines": ["Building intelligent", "applications that are"],
+    "ctaAccent": "scalable."
+  }
+}

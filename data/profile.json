@@ -1,0 +1,162 @@
+{
+  "name": {
+    "first": "Diwakar",
+    "last": "M L",
+    "full": "Diwakar M L"
+  },
+  "email": "diwakarml046@gmail.com",
+  "tagline": "Building intelligent full-stack applications with AI, ML, and modern web technologies.",
+  "description": "MCA graduate and full-stack developer passionate about AI-powered platforms, machine learning, REST APIs, and scalable serverless architectures.",
+  "speakingIntro": "Hi, I'm Diwakar M L, an MCA graduate with hands-on experience in AI, full-stack development, and data analytics. I've completed an AI internship, published research, developed real-world AI solutions, and collaborated on innovative hackathon projects. Welcome to my portfolio!",
+  "roles": {
+    "short": "Full-Stack Developer",
+    "detailed": "Full-Stack Developer | AI & ML Enthusiast | MCA Graduate"
+  },
+  "location": {
+    "based": "Bengaluru, India",
+    "availability": "Bengaluru / Remote"
+  },
+  "available": true,
+  "bio": "Enthusiastic and goal-driven MCA graduate from CMR Institute of Technology, Bengaluru. Skilled in full-stack development with Next.js, React, Node.js, and serverless backends. Experienced in building AI-powered platforms, machine learning models, REST APIs, and secure enterprise applications using PKI and Zero Trust Architecture. Published researcher with hands-on internship and hackathon experience.",
+  "stats": [
+    { "value": "3", "label": "Projects Built" },
+    { "value": "1", "label": "Research Paper" },
+    { "value": "1", "label": "Internship" }
+  ],
+  "skills": [
+    "Java",
+    "Python",
+    "JavaScript",
+    "HTML & CSS",
+    "SQL",
+    "Next.js",
+    "React",
+    "Node.js",
+    "Express.js",
+    "Convex",
+    "Clerk Auth",
+    "REST APIs",
+    "Machine Learning",
+    "MySQL",
+    "SQLite",
+    "Git & GitHub",
+    "Vercel",
+    "VS Code"
+  ],
+  "experience": [
+    {
+      "id": 1,
+      "role": "AI, Data Science & Analytics Intern",
+      "company": "YBI Foundation",
+      "companyShort": "YBI FOUNDATION",
+      "type": "Internship",
+      "location": "Remote",
+      "period": "2025",
+      "periodEnd": "2025",
+      "bullets": [
+        "Completed an internship focused on Artificial Intelligence, Machine Learning, and Data Analytics.",
+        "Gained hands-on experience in data analysis using Python libraries such as NumPy and Pandas.",
+        "Worked on machine learning concepts and model building with real-world datasets.",
+        "Created data visualizations for better insights and explored applications of Generative AI."
+      ],
+      "desc": "AI and data science internship covering machine learning, data analysis with Python, visualization, and Generative AI applications.",
+      "tech": ["Python", "NumPy", "Pandas", "Machine Learning", "Data Analytics", "Generative AI"]
+    },
+    {
+      "id": 2,
+      "role": "Team Member – eMudhra Hackathon 2026",
+      "company": "eMudhra Hackathon",
+      "companyShort": "eMUDHRA",
+      "type": "Hackathon",
+      "location": "Bengaluru",
+      "period": "2026",
+      "periodEnd": "2026",
+      "bullets": [
+        "Officially selected team for the eMudhra Hackathon 2026.",
+        "Designed and developed AgentTrust, a PKI-based Zero Trust platform for autonomous AI agents.",
+        "Implemented digital identities, real-time authorization, behavioral risk detection, and audit logging.",
+        "Built secure REST APIs to manage enterprise AI agent trust and identity lifecycle."
+      ],
+      "desc": "Hackathon project building a PKI-based Zero Trust platform for AI agent identity and trust management with real-time authorization and audit logging.",
+      "tech": ["Node.js", "Express.js", "SQLite", "REST APIs", "PKI", "Zero Trust", "JavaScript"]
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "title": "AI Content Creator",
+      "subtitle": "AI-Powered Influencer Platform",
+      "type": "Full-Stack AI",
+      "link": "https://github.com/Diwakarml/ai_creator_platform",
+      "image": "/assets/project-artgenio1.png",
+      "tech": ["Next.js", "React", "Convex", "Clerk Auth", "AI APIs", "Tailwind CSS", "Vercel"],
+      "desc": "Developed an AI-powered full-stack content creation platform using Next.js, Convex, and Clerk Authentication. Features include AI text and image generation, real-time analytics, content scheduling, and automated publishing workflows deployed on Vercel."
+    },
+    {
+      "id": 2,
+      "title": "AgentTrust",
+      "subtitle": "AI Agent Identity & Trust Platform",
+      "type": "Security / Full-Stack",
+      "link": "https://github.com/Diwakarml",
+      "image": "/assets/project-artgenio1.png",
+      "tech": ["Node.js", "Express.js", "SQLite", "REST APIs", "PKI", "Zero Trust", "JavaScript"],
+      "desc": "Designed an AI security platform providing digital identities, real-time authorization, behavioural monitoring, and audit logging for autonomous AI agents using PKI and Zero Trust Architecture."
+    },
+    {
+      "id": 3,
+      "title": "Churn Prediction",
+      "subtitle": "ML Retention Analytics System",
+      "type": "Machine Learning",
+      "link": "https://github.com/Diwakarml",
+      "image": "/assets/project-easyfolio1.png",
+      "tech": ["Python", "Pandas", "Scikit-learn", "SQL", "Logistic Regression", "Power BI"],
+      "desc": "Built a machine learning solution to predict customer churn using Python and Logistic Regression. Performed data cleaning, feature engineering, exploratory data analysis, and created interactive dashboards for data-driven retention strategies."
+    }
+  ],
+  "publications": [
+    {
+      "id": 1,
+      "title": "CREATR: AI-Powered Content Creator & Influencer Platform",
+      "platform": "Research Paper",
+      "year": "2026",
+      "link": "mailto:diwakarml046@gmail.com",
+      "desc": "Published research paper presenting AI-assisted content generation using LLMs, image generation, predictive analytics, multilingual translation, SEO optimisation, and serverless cloud architecture."
+    },
+    {
+      "id": 2,
+      "title": "AgentTrust – AI Agent Identity & Trust Management",
+      "platform": "Hackathon Project",
+      "year": "2026",
+      "link": "https://github.com/Diwakarml",
+      "desc": "PKI-based Zero Trust platform for autonomous AI agents with digital identities, real-time authorization, behavioral risk detection, and enterprise audit logging."
+    },
+    {
+      "id": 3,
+      "title": "Customer Churn Prediction & Retention Analytics",
+      "platform": "ML Project",
+      "year": "2026",
+      "link": "https://github.com/Diwakarml",
+      "desc": "Machine learning solution using Logistic Regression to predict customer churn, with interactive dashboards for data-driven retention strategies."
+    },
+    {
+      "id": 4,
+      "title": "Deloitte – Data Analytics Job Simulation",
+      "platform": "Certification",
+      "year": "2026",
+      "link": "https://www.linkedin.com/in/diwakar-m-l-746870303",
+      "desc": "Completed Deloitte's Data Analytics Job Simulation via Forage (July 2026). Performed hands-on tasks in Data Analysis and Forensic Technology, earning a Certificate of Completion signed by Deloitte's Chief Human Resources Officer."
+    },
+    {
+      "id": 5,
+      "title": "Azure, GCP & Power BI Certifications",
+      "platform": "Certifications",
+      "year": "2026",
+      "link": "https://www.linkedin.com/in/diwakar-m-l-746870303",
+      "desc": "Certified in Microsoft Azure Fundamentals, Google Cloud Compute, Microsoft Power BI, Machine Learning with Python, and Data Analysis with ChatGPT through Infosys Springboard and Udemy."
+    }
+  ],
+  "socials": [
+    { "label": "GitHub",   "href": "https://github.com/Diwakarml" },
+    { "label": "LinkedIn", "href": "https://www.linkedin.com/in/diwakar-m-l-746870303" }
+  ]
+}

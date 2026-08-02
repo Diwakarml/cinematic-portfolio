@@ -1,0 +1,13 @@
+﻿services:
+  - type: web
+    name: cinematic-portfolio
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22.x
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=512
+    autoDeploy: true
