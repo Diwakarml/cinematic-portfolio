@@ -145,11 +145,14 @@ export default function PublicationsFooterSection() {
         imgTex.minFilter = THREE.LinearFilter
         imgTex.magFilter = THREE.LinearFilter
 
+        const frameW = W * 0.46
+        const frameAspect = frameW / H
+
         vidUni = {
           uVideo:        { value: imgTex },
           uOpacity:      { value: 0 },
           uVideoAspect:  { value: imgTex.image.width / imgTex.image.height },
-          uCanvasAspect: { value: W / H },
+          uCanvasAspect: { value: frameAspect },
           uPan:          { value: new THREE.Vector2(0, 0) },
         }
 
@@ -159,22 +162,23 @@ export default function PublicationsFooterSection() {
           fragmentShader: VID_FRAG,
           transparent: true,
         })
-        const imgMesh = new THREE.Mesh(new THREE.PlaneGeometry(W * 1.1, H * 1.1), imgMat)
+        // Mesh exactly fills the centered 46vw column
+        const imgMesh = new THREE.Mesh(new THREE.PlaneGeometry(frameW, H), imgMat)
         imgMesh.position.z = 1
         scene.add(imgMesh)
 
-        // Ken Burns: smooth slow zoom + drift — cinematic effect
+        // Subtle Ken Burns: tiny zoom + minimal drift — face always stays centered
         let t = 0
         function tick() {
           rafId = requestAnimationFrame(tick)
           t += 0.002
           if (vidUni) {
-            // Slow zoom by scaling the mesh
-            const zoom = 1.0 + 0.05 * Math.sin(t * 0.4)
+            // Zoom: only ±1% — keeps full photo and frame completely visible
+            const zoom = 1.0 + 0.01 * Math.sin(t * 0.3)
             imgMesh.scale.set(zoom, zoom, 1)
-            // Gentle drift
-            vidUni.uPan.value.x = 0.012 * Math.sin(t * 0.3)
-            vidUni.uPan.value.y = 0.008 * Math.cos(t * 0.35)
+            // Tiny subtle drift around center (0,0)
+            vidUni.uPan.value.x = 0.002 * Math.sin(t * 0.25)
+            vidUni.uPan.value.y = 0.002 * Math.cos(t * 0.28)
           }
           renderer.render(scene, camera)
         }
@@ -196,7 +200,7 @@ export default function PublicationsFooterSection() {
         camera.left   = -w / 2; camera.right  = w / 2
         camera.top    =  h / 2; camera.bottom = -h / 2
         camera.updateProjectionMatrix()
-        if (vidUni) vidUni.uCanvasAspect.value = w / h
+        if (vidUni) vidUni.uCanvasAspect.value = (w * 0.46) / h
       }
       window.addEventListener('resize', onResize)
     }

@@ -17,7 +17,18 @@ export default function ProjectsSection() {
   const progressRef = useRef(null)
   const [slideIdx, setSlideIdx] = useState(0)
 
+  // Mobile-specific state & refs
+  const mobileTrackRef = useRef(null)
+  const [mobileIdx, setMobileIdx] = useState(0)
+  const mobileIdxRef   = useRef(0)
+  const mobileBusyRef  = useRef(false)
+
+  // ── Desktop: GSAP ScrollTrigger horizontal slide ────────────────────────────
   useEffect(() => {
+    if (typeof window === 'undefined') return
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
+    if (isMobile) return   // mobile uses button nav — skip this entirely
+
     const section = sectionRef.current
     const track   = trackRef.current
     if (!section || !track) return
@@ -107,7 +118,29 @@ export default function ProjectsSection() {
     return () => st.kill()
   }, [])
 
-  return (
+  // ── Mobile: GSAP-powered button navigation ──────────────────────────────────
+  function mobileGoTo(nextIdx) {
+    const n = PROJECTS.length
+    if (nextIdx < 0 || nextIdx >= n || mobileBusyRef.current) return
+    mobileBusyRef.current = true
+
+    const track = mobileTrackRef.current
+    if (!track) { mobileBusyRef.current = false; return }
+
+    gsap.to(track, {
+      x: -(nextIdx * window.innerWidth),
+      duration: 0.45,
+      ease: 'power3.inOut',
+      onComplete: () => {
+        mobileIdxRef.current = nextIdx
+        setMobileIdx(nextIdx)
+        mobileBusyRef.current = false
+      },
+    })
+  }
+
+  // ── Desktop JSX ─────────────────────────────────────────────────────────────
+  const desktopContent = (
     <div style={{ height: `${PROJECTS.length * 100}vh` }}>
       <section ref={sectionRef} className={styles.section}>
 
@@ -196,5 +229,128 @@ export default function ProjectsSection() {
 
       </section>
     </div>
+  )
+
+  // ── Mobile JSX: single 100svh section with Prev/Next buttons ────────────────
+  const mobileContent = (
+    <section className={`${styles.section} ${styles.sectionMobile}`}>
+
+      {/* Top bar */}
+      <div className={styles.topBar}>
+        <span className={styles.sectionLabel}>Featured Work</span>
+        <div className={styles.counter}>
+          <span className={styles.cCur}>0{mobileIdx + 1}</span>
+          <span className={styles.cSep}> / </span>
+          <span className={styles.cTot}>0{PROJECTS.length}</span>
+        </div>
+      </div>
+
+      {/* Clipping viewport — overflow hidden */}
+      <div className={styles.mobileViewport}>
+        {/* Sliding track */}
+        <div
+          ref={mobileTrackRef}
+          className={styles.mobileTrack}
+        >
+          {PROJECTS.map((proj, i) => (
+            <div key={proj.id} className={styles.mobileSlide}>
+
+              {/* Background */}
+              <div className={styles.slideBg}>
+                <Image
+                  src={proj.image}
+                  alt={proj.title}
+                  fill
+                  quality={90}
+                  sizes="100vw"
+                  className={styles.slideImg}
+                  priority={i === 0}
+                />
+                <div className={styles.slideOverlayLeft}   aria-hidden />
+                <div className={styles.slideOverlayBottom} aria-hidden />
+                <div className={styles.slideVignette}      aria-hidden />
+              </div>
+
+              {/* Content */}
+              <div className={styles.mobileSlideContent}>
+                <div className={styles.mobileMeta}>
+                  <span className={styles.typeTag}>{proj.type}</span>
+                  <span className={styles.mobileSlideNum}>0{i + 1}</span>
+                </div>
+
+                <h2 className={styles.mobileTitle}>{proj.title}</h2>
+                <p  className={styles.mobileSubtitle}>{proj.subtitle}</p>
+                <p  className={styles.mobileDesc}>{proj.desc}</p>
+
+                <div className={styles.mobileStack}>
+                  {proj.tech.slice(0, 5).map(t => (
+                    <span key={t} className={styles.tag}>{t}</span>
+                  ))}
+                </div>
+
+                <a
+                  href={proj.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.liveBtn}
+                >
+                  <span>Live Demo</span>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
+                    <path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </a>
+              </div>
+
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Prev button */}
+      <button
+        className={`${styles.mobileNavBtn} ${styles.mobileNavBtnPrev}`}
+        onClick={() => mobileGoTo(mobileIdx - 1)}
+        disabled={mobileIdx === 0}
+        aria-label="Previous project"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+
+      {/* Next button */}
+      <button
+        className={`${styles.mobileNavBtn} ${styles.mobileNavBtnNext}`}
+        onClick={() => mobileGoTo(mobileIdx + 1)}
+        disabled={mobileIdx === PROJECTS.length - 1}
+        aria-label="Next project"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+
+      {/* Dot pagination */}
+      <div className={styles.mobileDots} role="tablist" aria-label="Project navigation">
+        {PROJECTS.map((_, i) => (
+          <button
+            key={i}
+            role="tab"
+            aria-selected={i === mobileIdx}
+            aria-label={`Go to project ${i + 1}`}
+            className={`${styles.mobileDot} ${i === mobileIdx ? styles.mobileDotActive : ''}`}
+            onClick={() => mobileGoTo(i)}
+          />
+        ))}
+      </div>
+
+    </section>
+  )
+
+  return (
+    <>
+      <div className={styles.desktopOnly}>{desktopContent}</div>
+      <div className={styles.mobileOnly}>{mobileContent}</div>
+    </>
   )
 }

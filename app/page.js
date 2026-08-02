@@ -14,7 +14,8 @@ import profile               from '@/data/profile.json'
 
 // Snap: 0=video 1=hero 2=about 3..4=projects 5=work-exp 6=publications 7=footer (mobile: 6=publications 7=footer)
 const PROJECT_SLIDES = profile.projects.length
-const TOTAL          = 7 + PROJECT_SLIDES  // 9
+// TOTAL is responsive: desktop = 7 + PROJECT_SLIDES, mobile = 7 + 1
+// Computed inside useEffect so it can react to screen size.
 
 export default function Home() {
   const mainRef        = useRef(null)
@@ -22,11 +23,17 @@ export default function Home() {
   const busyRef        = useRef(false)
   const tweenRef       = useRef(null)
   const loopOverlayRef = useRef(null)
+  const totalRef       = useRef(7 + PROJECT_SLIDES)  // updated in useEffect
   const [showLoader, setShowLoader] = useState(true)
 
   useEffect(() => {
     const el = mainRef.current
     if (!el) return
+
+    const isMobileQuery = window.matchMedia('(max-width: 767px)')
+    const isMobile = isMobileQuery.matches
+    // On mobile the Projects section sits in a single scroll slot
+    totalRef.current = isMobile ? 8 : 7 + PROJECT_SLIDES
 
     // Fade to black → instant scrollTop jump → fade in
     // Used whenever we loop footer → first section
@@ -54,6 +61,7 @@ export default function Home() {
     }
 
     function goTo(idx) {
+      const TOTAL = totalRef.current
       // Wrap-around
       if (idx >= TOTAL) idx = 0
       if (idx < 0)      idx = TOTAL - 1
@@ -101,13 +109,19 @@ export default function Home() {
       idxRef.current = Math.round(el.scrollTop / window.innerHeight)
     }
 
+    // Keep totalRef in sync if orientation changes
+    function onResize() {
+      const nowMobile = window.matchMedia('(max-width: 767px)').matches
+      totalRef.current = nowMobile ? 8 : 7 + PROJECT_SLIDES
+    }
+    window.addEventListener('resize', onResize, { passive: true })
+
     // Footer video ends → same fade-cut loop back to top
     function onFooterLoop() {
       if (busyRef.current) return
       fadeLoop(0, 0)
     }
 
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
 
     el.addEventListener('wheel',  onWheel,  { passive: false })
     el.addEventListener('scroll', onScroll, { passive: true  })
@@ -120,7 +134,7 @@ export default function Home() {
       const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 8
       const atTop    = el.scrollTop < 8
       if (dy > 0 && atBottom) fadeLoop(0, 0)
-      if (dy < 0 && atTop)    fadeLoop(el.scrollHeight - el.clientHeight, TOTAL - 1)
+      if (dy < 0 && atTop)    fadeLoop(el.scrollHeight - el.clientHeight, totalRef.current - 1)
     }
 
     if (!isMobile) {
@@ -143,6 +157,7 @@ export default function Home() {
         el.removeEventListener('touchend',   onMobileTouchEnd)
       }
       window.removeEventListener('footer-loop-back', onFooterLoop)
+      window.removeEventListener('resize', onResize)
       tweenRef.current?.kill()
     }
   }, [])
