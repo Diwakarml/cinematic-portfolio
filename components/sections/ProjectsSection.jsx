@@ -22,7 +22,7 @@ export default function ProjectsSection() {
     if (!track) { busyRef.current = false; return }
 
     gsap.to(track, {
-      xPercent: -(nextIdx * 100),
+      xPercent: -(nextIdx * (100 / PROJECTS.length)),
       duration: 0.5,
       ease: 'power3.inOut',
       onComplete: () => {
