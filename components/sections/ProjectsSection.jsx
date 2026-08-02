@@ -1,177 +1,67 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import Image from 'next/image'
-import { gsap, ScrollTrigger } from '@/lib/gsap'
+import { gsap } from '@/lib/gsap'
 import profile from '@/data/profile.json'
 import styles from '@/styles/sections/ProjectsSection.module.css'
 
 const PROJECTS = profile.projects
 
 export default function ProjectsSection() {
-  const sectionRef  = useRef(null)
-  const trackRef    = useRef(null)
-  const contentRefs = useRef([])
-  const bgRefs      = useRef([])
-  const counterRef  = useRef(null)
-  const progressRef = useRef(null)
-  const [slideIdx, setSlideIdx] = useState(0)
+  const trackRef  = useRef(null)
+  const busyRef   = useRef(false)
+  const [activeIdx, setActiveIdx] = useState(0)
 
-  // Mobile-specific state & refs
-  const mobileTrackRef = useRef(null)
-  const [mobileIdx, setMobileIdx] = useState(0)
-  const mobileIdxRef   = useRef(0)
-  const mobileBusyRef  = useRef(false)
-
-  // ── Desktop: GSAP ScrollTrigger horizontal slide ────────────────────────────
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
-    if (isMobile) return   // mobile uses button nav — skip this entirely
-
-    const section = sectionRef.current
-    const track   = trackRef.current
-    if (!section || !track) return
-
-    const scroller = document.querySelector('main')
-    if (!scroller) return
+  function goTo(nextIdx) {
     const n = PROJECTS.length
-    contentRefs.current = contentRefs.current.slice(0, n)
-    bgRefs.current      = bgRefs.current.slice(0, n)
+    if (nextIdx < 0 || nextIdx >= n || busyRef.current) return
+    busyRef.current = true
 
-    // Slides 2+ hidden initially
-    contentRefs.current.forEach((el, i) => {
-      if (el && i > 0) gsap.set(el, { opacity: 0, y: 30 })
-    })
-
-    const tl = gsap.timeline({ paused: true })
-
-    // Horizontal slide - xPercent is viewport-independent
-    tl.to(track, {
-      xPercent: -((n - 1) / n * 100),
-      ease: 'none',
-      duration: n - 1,
-    }, 0)
-
-    for (let i = 0; i < n - 1; i++) {
-      const curr   = contentRefs.current[i]
-      const next   = contentRefs.current[i + 1]
-      const nextBg = bgRefs.current[i + 1]
-
-      if (curr) {
-        tl.to(curr, {
-          opacity: 0, y: -40, filter: 'blur(6px)',
-          duration: 0.2, ease: 'power2.in',
-        }, i + 0.30)
-      }
-
-      if (nextBg) {
-        tl.fromTo(nextBg,
-          { scale: 1.04 },
-          { scale: 1.0, duration: 1.0, ease: 'power2.out' },
-          i
-        )
-      }
-
-      if (next) {
-        tl.set(next, { opacity: 1, y: 0 }, i + 0.44)
-
-        const meta  = next.querySelector(`.${styles.meta}`)
-        const title = next.querySelector(`.${styles.title}`)
-        const sub   = next.querySelector(`.${styles.subtitle}`)
-        const desc  = next.querySelector(`.${styles.desc}`)
-        const tags  = next.querySelectorAll(`.${styles.tag}`)
-        const btn   = next.querySelector(`.${styles.liveBtn}`)
-
-        if (meta)  tl.fromTo(meta,  { x: -10, opacity: 0 }, { x: 0, opacity: 1, duration: 0.25, ease: 'power2.out' }, i + 0.45)
-        if (title) tl.fromTo(title, { opacity: 0, y: 20 },  { opacity: 1, y: 0, duration: 0.45, ease: 'expo.out'   }, i + 0.48)
-        if (sub)   tl.fromTo(sub,   { y: 12, opacity: 0 },  { y: 0, opacity: 1, duration: 0.30, ease: 'power2.out' }, i + 0.54)
-        if (desc)  tl.fromTo(desc,  { y: 10, opacity: 0 },  { y: 0, opacity: 1, duration: 0.35, ease: 'power2.out' }, i + 0.58)
-        if (tags.length) {
-          tl.fromTo(tags,  { y: 6, opacity: 0 },  { y: 0, opacity: 1, duration: 0.25, ease: 'power2.out', stagger: 0.03 }, i + 0.65)
-        }
-        if (btn)   tl.fromTo(btn,   { y: 8, opacity: 0 },  { y: 0, opacity: 1, duration: 0.30, ease: 'power2.out' }, i + 0.72)
-      }
-    }
-
-    const st = ScrollTrigger.create({
-      trigger:  section,
-      scroller,
-      start:    'top top',
-      end:      () => `+=${(n - 1) * window.innerHeight}`,
-      onUpdate: (self) => {
-        tl.progress(self.progress)
-
-        const activeIdx = Math.round(self.progress * (n - 1))
-        setSlideIdx(prev => prev !== activeIdx ? activeIdx : prev)
-
-        if (progressRef.current) {
-          gsap.set(progressRef.current, {
-            scaleX: self.progress, transformOrigin: 'left center', overwrite: true,
-          })
-        }
-
-        if (counterRef.current) counterRef.current.textContent = `0${activeIdx + 1}`
-      },
-    })
-
-    return () => st.kill()
-  }, [])
-
-  // ── Mobile: GSAP-powered button navigation ──────────────────────────────────
-  function mobileGoTo(nextIdx) {
-    const n = PROJECTS.length
-    if (nextIdx < 0 || nextIdx >= n || mobileBusyRef.current) return
-    mobileBusyRef.current = true
-
-    const track = mobileTrackRef.current
-    if (!track) { mobileBusyRef.current = false; return }
+    const track = trackRef.current
+    if (!track) { busyRef.current = false; return }
 
     gsap.to(track, {
-      x: -(nextIdx * window.innerWidth),
-      duration: 0.45,
+      xPercent: -(nextIdx * 100),
+      duration: 0.5,
       ease: 'power3.inOut',
       onComplete: () => {
-        mobileIdxRef.current = nextIdx
-        setMobileIdx(nextIdx)
-        mobileBusyRef.current = false
+        setActiveIdx(nextIdx)
+        busyRef.current = false
       },
     })
   }
 
-  // ── Desktop JSX ─────────────────────────────────────────────────────────────
-  const desktopContent = (
-    <div style={{ height: `${PROJECTS.length * 100}vh` }}>
-      <section ref={sectionRef} className={styles.section}>
+  return (
+    <section className={styles.section}>
 
-        {/* Top bar */}
-        <div className={styles.topBar}>
-          <span className={styles.sectionLabel}>Featured Work</span>
-          <div className={styles.counter}>
-            <span ref={counterRef} className={styles.cCur}>01</span>
-            <span className={styles.cSep}> / </span>
-            <span className={styles.cTot}>0{PROJECTS.length}</span>
-          </div>
+      {/* Top bar */}
+      <div className={styles.topBar}>
+        <span className={styles.sectionLabel}>Featured Work</span>
+        <div className={styles.counter}>
+          <span className={styles.cCur}>0{activeIdx + 1}</span>
+          <span className={styles.cSep}> / </span>
+          <span className={styles.cTot}>0{PROJECTS.length}</span>
         </div>
+      </div>
 
-        {/* Horizontal track */}
+      {/* Viewport & Sliding Track */}
+      <div className={styles.viewport}>
         <div
           ref={trackRef}
           className={styles.track}
-          style={{ width: `${PROJECTS.length * 100}vw` }}
+          style={{ width: `${PROJECTS.length * 100}%` }}
         >
           {PROJECTS.map((proj, i) => (
-            <div key={proj.id} className={styles.slide}>
+            <div key={proj.id} className={styles.slide} style={{ width: `${100 / PROJECTS.length}%` }}>
 
-              <div
-                ref={el => { bgRefs.current[i] = el }}
-                className={styles.slideBg}
-              >
+              {/* Background image & overlays */}
+              <div className={styles.slideBg}>
                 <Image
                   src={proj.image}
                   alt={proj.title}
                   fill
-                  quality={100}
+                  quality={95}
                   sizes="100vw"
                   className={styles.slideImg}
                   priority={i === 0}
@@ -181,12 +71,13 @@ export default function ProjectsSection() {
                 <div className={styles.slideVignette}      aria-hidden />
               </div>
 
+              {/* Decorative background slide number */}
               <span className={styles.slideNum} aria-hidden>0{i + 1}</span>
 
-              <div
-                ref={el => { contentRefs.current[i] = el }}
-                className={styles.slideContent}
-              >
+              {/* Slide Content */}
+              <div className={styles.slideContent}>
+
+                {/* Left column: identity, title, demo button */}
                 <div className={styles.slideLeft}>
                   <div className={styles.meta}>
                     <span className={styles.typeTag}>{proj.type}</span>
@@ -206,6 +97,7 @@ export default function ProjectsSection() {
                   </a>
                 </div>
 
+                {/* Right column: description, tech stack */}
                 <div className={styles.slideRight}>
                   <p className={styles.desc}>{proj.desc}</p>
                   <div className={styles.stack}>
@@ -214,91 +106,7 @@ export default function ProjectsSection() {
                     ))}
                   </div>
                 </div>
-              </div>
 
-            </div>
-          ))}
-        </div>
-
-        {/* Progress bar */}
-        <div className={styles.bottomUI}>
-          <div className={styles.progressTrack}>
-            <div ref={progressRef} className={styles.progressBar} />
-          </div>
-        </div>
-
-      </section>
-    </div>
-  )
-
-  // ── Mobile JSX: single 100svh section with Prev/Next buttons ────────────────
-  const mobileContent = (
-    <section className={`${styles.section} ${styles.sectionMobile}`}>
-
-      {/* Top bar */}
-      <div className={styles.topBar}>
-        <span className={styles.sectionLabel}>Featured Work</span>
-        <div className={styles.counter}>
-          <span className={styles.cCur}>0{mobileIdx + 1}</span>
-          <span className={styles.cSep}> / </span>
-          <span className={styles.cTot}>0{PROJECTS.length}</span>
-        </div>
-      </div>
-
-      {/* Clipping viewport — overflow hidden */}
-      <div className={styles.mobileViewport}>
-        {/* Sliding track */}
-        <div
-          ref={mobileTrackRef}
-          className={styles.mobileTrack}
-        >
-          {PROJECTS.map((proj, i) => (
-            <div key={proj.id} className={styles.mobileSlide}>
-
-              {/* Background */}
-              <div className={styles.slideBg}>
-                <Image
-                  src={proj.image}
-                  alt={proj.title}
-                  fill
-                  quality={90}
-                  sizes="100vw"
-                  className={styles.slideImg}
-                  priority={i === 0}
-                />
-                <div className={styles.slideOverlayLeft}   aria-hidden />
-                <div className={styles.slideOverlayBottom} aria-hidden />
-                <div className={styles.slideVignette}      aria-hidden />
-              </div>
-
-              {/* Content */}
-              <div className={styles.mobileSlideContent}>
-                <div className={styles.mobileMeta}>
-                  <span className={styles.typeTag}>{proj.type}</span>
-                  <span className={styles.mobileSlideNum}>0{i + 1}</span>
-                </div>
-
-                <h2 className={styles.mobileTitle}>{proj.title}</h2>
-                <p  className={styles.mobileSubtitle}>{proj.subtitle}</p>
-                <p  className={styles.mobileDesc}>{proj.desc}</p>
-
-                <div className={styles.mobileStack}>
-                  {proj.tech.slice(0, 5).map(t => (
-                    <span key={t} className={styles.tag}>{t}</span>
-                  ))}
-                </div>
-
-                <a
-                  href={proj.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.liveBtn}
-                >
-                  <span>Live Demo</span>
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
-                    <path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </a>
               </div>
 
             </div>
@@ -306,51 +114,43 @@ export default function ProjectsSection() {
         </div>
       </div>
 
-      {/* Prev button */}
+      {/* Navigation Buttons: Previous & Next */}
       <button
-        className={`${styles.mobileNavBtn} ${styles.mobileNavBtnPrev}`}
-        onClick={() => mobileGoTo(mobileIdx - 1)}
-        disabled={mobileIdx === 0}
+        className={`${styles.navBtn} ${styles.navBtnPrev}`}
+        onClick={() => goTo(activeIdx - 1)}
+        disabled={activeIdx === 0}
         aria-label="Previous project"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
           <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </button>
 
-      {/* Next button */}
       <button
-        className={`${styles.mobileNavBtn} ${styles.mobileNavBtnNext}`}
-        onClick={() => mobileGoTo(mobileIdx + 1)}
-        disabled={mobileIdx === PROJECTS.length - 1}
+        className={`${styles.navBtn} ${styles.navBtnNext}`}
+        onClick={() => goTo(activeIdx + 1)}
+        disabled={activeIdx === PROJECTS.length - 1}
         aria-label="Next project"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
           <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </button>
 
-      {/* Dot pagination */}
-      <div className={styles.mobileDots} role="tablist" aria-label="Project navigation">
+      {/* Dot Pagination */}
+      <div className={styles.dots} role="tablist" aria-label="Project navigation">
         {PROJECTS.map((_, i) => (
           <button
             key={i}
             role="tab"
-            aria-selected={i === mobileIdx}
+            aria-selected={i === activeIdx}
             aria-label={`Go to project ${i + 1}`}
-            className={`${styles.mobileDot} ${i === mobileIdx ? styles.mobileDotActive : ''}`}
-            onClick={() => mobileGoTo(i)}
+            className={`${styles.dot} ${i === activeIdx ? styles.dotActive : ''}`}
+            onClick={() => goTo(i)}
           />
         ))}
       </div>
 
     </section>
-  )
-
-  return (
-    <>
-      <div className={styles.desktopOnly}>{desktopContent}</div>
-      <div className={styles.mobileOnly}>{mobileContent}</div>
-    </>
   )
 }
